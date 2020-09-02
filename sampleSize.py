@@ -87,17 +87,14 @@ def create_mde_table(daily_observations, daily_conversions, n_variants, alpha=0.
     p0 = daily_conversions / daily_observations
     mde_range = np.arange(0.001, 0.2001, 0.001)
 
-    sample_sizes = [compute_sample_size(p0, mde) * n_variants for mde in mde_range]
+    sample_sizes = [compute_sample_size(p0, mde, alpha, beta) * n_variants for mde in mde_range]
     p1 = [p0 * (1 + mde) for mde in mde_range]
-
-    pd.options.display.float_format = '{:.2f}'.format
 
     df = pd.DataFrame([mde_range, p1, sample_sizes]).transpose()
     df.columns = ['MDE', 'New Conv. Rate', 'Sample Size']
     df['Sample Size'] = df['Sample Size'].astype(int)
     df['Days'] = df['Sample Size'] / daily_observations
     df['Weeks'] = df['Days'] / 7
-    pd.options.display.float_format = '{:,.2f}'.format
     df['Extra conversions (monthly)'] = round(p0 * df.MDE * daily_observations * 365 / 12)
     try:
         df['Extra revenue (monthly)'] = round(df['Extra conversions (monthly)'] * aov)
@@ -131,19 +128,21 @@ st.sidebar.markdown("""
 
 80% is generally accepted as the minimum required power level.
 """)
-beta = 1 - st.sidebar.slider('Power', value=0.8, min_value=0.5)
+beta = 1 - st.sidebar.slider('Power', value=0.8, min_value=0.5, max_value=0.99)
 
 st.sidebar.markdown("""
 ### Maximum runtime
 
 To show increased runtimes on the plot.
 """)
-max_runtime = st.sidebar.number_input('Max runtime (weeks)', value=4)
+max_runtime = st.sidebar.number_input('Max runtime (weeks)', value=4, max_value=20)
 
-if alpha and beta:
-    df = create_mde_table(daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta)
-else:
-    df = create_mde_table(daily_obs, daily_cons, n_variants)
+df = create_mde_table(daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta)
+
+# if alpha and beta:
+#     df = create_mde_table(daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta)
+# else:
+#     df = create_mde_table(daily_obs, daily_cons, n_variants)
 
 
 def plot_mde_marker(df, weeks, ax):
@@ -163,12 +162,13 @@ def plot_mde_marker(df, weeks, ax):
     )
 
     try:
+        isLess = df['Weeks'] <= weeks
         mde_text = "MDE = {:.2%}, Monthly value = £{:,.0f}" \
-            .format(df[df['Weeks'] <= weeks]['MDE'].min(), df[df['Weeks'] <= weeks]['Extra conversions (monthly)'].min())
-    except NameError:
-        mde_text = f"MDE = {df[df['Weeks'] <= weeks]['MDE'].min():.2%}"
-    except KeyError:
-        mde_text = f"MDE = {df[df['Weeks'] <= weeks]['MDE'].min():.2%}"
+            .format(df[isLess]['MDE'].min(), df[isLess]['Extra revenue (monthly)'].min())
+    except:
+        mde_text = f"MDE = {df[isLess]['MDE'].min():.2%}"
+    # except KeyError:
+    #     mde_text = f"MDE = {df[isLess]['MDE'].min():.2%}"
 
     ax.text(
         df[df['Weeks'] <= weeks]['MDE'].min() + 0.005 / weeks,
