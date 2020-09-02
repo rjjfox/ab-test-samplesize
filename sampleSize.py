@@ -164,7 +164,7 @@ def plot_mde_marker(df, weeks, ax):
 
     try:
         mde_text = "MDE = {:.2%}, Monthly value = £{:,.0f}" \
-            .format(df[df['Weeks'] <= weeks]['MDE'].min(), df[df['Weeks'] <= weeks]['Monthly extra revenue'].min())
+            .format(df[df['Weeks'] <= weeks]['MDE'].min(), df[df['Weeks'] <= weeks]['Extra conversions (monthly)'].min())
     except NameError:
         mde_text = f"MDE = {df[df['Weeks'] <= weeks]['MDE'].min():.2%}"
     except KeyError:
