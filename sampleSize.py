@@ -21,7 +21,7 @@ plt.rc('font', **font)
 """
 # AB Test Sample Sizer
 
-Simply input the expected daily observations and conversions to return a plot
+Input the expected daily observations and conversions to return a plot
 containing potential runtimes and their associated minimum detectable effect.
 """
 
