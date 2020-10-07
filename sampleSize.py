@@ -1,22 +1,27 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 import matplotlib.ticker as mtick
 from scipy.stats import norm
-import math
 import streamlit as st
 
 roboto = {'fontname': 'Roboto', 'size': '11'}
 roboto_light = {'fontname': 'Roboto', 'size': '10', 'weight': 'light'}
 roboto_title = {'fontname': 'Roboto', 'size': '12', 'weight': 'bold'}
-roboto_table_header = {'fontname': 'Roboto', 'size': '9', 'weight': 'bold'}
 roboto_small = {'fontname': 'Roboto', 'size': '7.5', 'weight': 'light'}
+
+font = {
+    'family': 'sans-serif',
+    'sans-serif': 'roboto',
+    'size': 11
+}
+
+plt.rc('font', **font)
 
 """
 # AB Test Sample Sizer
 
-Simply input the expected daily observations and conversions to return a plot 
+Simply input the expected daily observations and conversions to return a plot
 containing potential runtimes and their associated minimum detectable effect.
 """
 
@@ -27,13 +32,17 @@ f"Base conversion rate {daily_cons / daily_obs:.2%}"
 n_variants = st.number_input("Number of variants", value=2)
 
 if st.checkbox('Add business value'):
-    st.write('This is for calculating the potential business value of the change, if successful and served to 100%.')
-    aov = st.number_input('Average order value', value=180)
+    st.write(
+        """This is for calculating the potential business value of the change,
+        if successful and served to 100%."""
+        )
+    aov = st.number_input('Average conversion value', value=180)
 
 
 def compute_sample_size(p0, mde, alpha=0.05, beta=0.2):
     """
-    Returns the sample size for a two-tailed AB test comparing conversion rates.
+    Returns the sample size for a two-tailed AB test comparing conversion
+    rates.
 
     The sample size equation is for binomial distributions only.
 
@@ -43,16 +52,18 @@ def compute_sample_size(p0, mde, alpha=0.05, beta=0.2):
         Baseline conversion rate
 
     mde : float or int
-        Minimum detectable effect. This is the 'sensitivity' of the test or the relative
-        difference in conversion rates that you want to be able to detect.
+        Minimum detectable effect. This is the 'sensitivity' of the test or
+        the relative difference in conversion rates that you want to be able
+        to detect.
 
     alpha : float
-        The chances of a Type I error. Tests are normally run to a 95% significance
-        meaning an alpha of 1 - 0.95 = 0.05. Default = 0.05.
+        The chances of a Type I error. Tests are normally run to a 95%
+        significance meaning an alpha of 1 - 0.95 = 0.05. Default = 0.05.
 
     beta : float
-        The chances of a Type II error. For sample sizing, a beta of 0.2 is acceptable and
-        provides the test with 80% statistical power as is standard.
+        The chances of a Type II error. For sample sizing, a beta of 0.2 is
+        acceptable and provides the test with 80% statistical power as is
+        standard.
 
     Returns
     -------
@@ -60,11 +71,15 @@ def compute_sample_size(p0, mde, alpha=0.05, beta=0.2):
     """
 
     p1 = p0 * (1 + mde)
-    N = (norm.ppf(1 - alpha / 2) + norm.ppf(1 - beta)) ** 2 * (p0 * (1 - p0) + p1 * (1 - p1)) / ((p0 - p1) ** 2)
+    N = (
+        norm.ppf(1 - alpha / 2) + norm.ppf(1 - beta)
+        ) ** 2 * (p0 * (1 - p0) + p1 * (1 - p1)) / ((p0 - p1) ** 2)
     return int(N)
 
 
-def create_mde_table(daily_observations, daily_conversions, n_variants, alpha=0.05, beta=0.2):
+def create_mde_table(
+    daily_observations, daily_conversions, n_variants, alpha=0.05, beta=0.2
+        ):
     """Returns the sample sizes and runtimes for different impact sizes based
     on the daily observations and conversions input.
 
@@ -85,19 +100,29 @@ def create_mde_table(daily_observations, daily_conversions, n_variants, alpha=0.
     """
 
     p0 = daily_conversions / daily_observations
-    mde_range = np.arange(0.001, 0.2001, 0.001)
+    mde_range = np.arange(0.001, 2.001, 0.001)
 
-    sample_sizes = [compute_sample_size(p0, mde, alpha, beta) * n_variants for mde in mde_range]
+    sample_sizes = [
+        compute_sample_size(
+            p0, mde, alpha, beta
+            ) * n_variants for mde in mde_range
+        ]
     p1 = [p0 * (1 + mde) for mde in mde_range]
 
     df = pd.DataFrame([mde_range, p1, sample_sizes]).transpose()
     df.columns = ['MDE', 'New Conv. Rate', 'Sample Size']
-    df['Sample Size'] = df['Sample Size'].astype(int)
+    # We convert to np.int64 to round the number and also to avoid
+    # hitting the int32 limit
+    df['Sample Size'] = df['Sample Size'].astype(np.int64)
     df['Days'] = df['Sample Size'] / daily_observations
     df['Weeks'] = df['Days'] / 7
-    df['Extra conversions (monthly)'] = round(p0 * df.MDE * daily_observations * 365 / 12)
+    df['Extra conversions (monthly)'] = round(
+        p0 * df.MDE * daily_observations * 365 / 12
+        )
     try:
-        df['Extra revenue (monthly)'] = round(df['Extra conversions (monthly)'] * aov)
+        df['Extra revenue (monthly)'] = round(
+            df['Extra conversions (monthly)'] * aov
+            )
     except NameError:
         pass
 
@@ -108,7 +133,8 @@ def create_mde_table(daily_observations, daily_conversions, n_variants, alpha=0.
 st.sidebar.markdown("""
 ### Significance level
 
-95% is often used as the threshold before a result is declared as statistically significant. 
+95% is often used as the threshold before a result is declared as
+statistically significant.
 """)
 
 
@@ -128,27 +154,32 @@ st.sidebar.markdown("""
 
 80% is generally accepted as the minimum required power level.
 """)
-beta = 1 - st.sidebar.slider('Power', value=0.8, min_value=0.5, max_value=0.99)
+beta = 1 - st.sidebar.slider(
+    'Power', value=0.8, min_value=0.5, max_value=0.99
+    )
 
 st.sidebar.markdown("""
 ### Maximum runtime
 
 To show increased runtimes on the plot.
 """)
-max_runtime = st.sidebar.number_input('Max runtime (weeks)', value=4, max_value=20)
+max_runtime = st.sidebar.number_input(
+    'Max runtime (weeks)', value=4, max_value=20
+    )
 
-df = create_mde_table(daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta)
-
-# if alpha and beta:
-#     df = create_mde_table(daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta)
-# else:
-#     df = create_mde_table(daily_obs, daily_cons, n_variants)
+df = create_mde_table(
+    daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta
+    )
 
 
 def plot_mde_marker(df, weeks, ax):
     days = weeks * 7
-    ax.axhline(y=days, linestyle='--',
-               xmax=(df[df['Weeks'] <= weeks]['MDE'].min() - ax.get_xlim()[0]) / ax.get_xlim()[1] - 0.01)
+    ax.axhline(
+        y=days, linestyle='--',
+        xmax=(
+            df[df['Weeks'] <= weeks]['MDE'].min() -
+            ax.get_xlim()[0]) / ax.get_xlim()[1] - 0.01
+            )
     if weeks > 1:
         week_text = 'weeks'
     else:
@@ -164,14 +195,15 @@ def plot_mde_marker(df, weeks, ax):
     try:
         isLess = df['Weeks'] <= weeks
         mde_text = "MDE = {:.2%}, Monthly value = £{:,.0f}" \
-            .format(df[isLess]['MDE'].min(), df[isLess]['Extra revenue (monthly)'].min())
-    except:
+            .format(
+                df[isLess]['MDE'].min(),
+                df[isLess]['Extra revenue (monthly)'].min()
+                )
+    except KeyError:
         mde_text = f"MDE = {df[isLess]['MDE'].min():.2%}"
-    # except KeyError:
-    #     mde_text = f"MDE = {df[isLess]['MDE'].min():.2%}"
 
     ax.text(
-        df[df['Weeks'] <= weeks]['MDE'].min() + 0.005 / weeks,
+        df[df['Weeks'] <= weeks]['MDE'].min()*1.05,
         days - 0.5,
         mde_text,
         horizontalalignment='left',
@@ -185,7 +217,10 @@ def y_format(x, pos):
 
 def mde_plot(data):
     fig, ax = plt.subplots(figsize=(10, 5), dpi=100)
-    ax.plot('MDE', 'Days', data=data, linewidth=2, solid_capstyle='round', color='#014d64')
+    ax.plot(
+        'MDE', 'Days', data=data,
+        linewidth=2, solid_capstyle='round', color='#014d64'
+        )
 
     # Formatting the tick labels
 
@@ -201,6 +236,10 @@ def mde_plot(data):
     # Set limit to reasonable amount of time
     if ax.get_ylim()[1] > 60:
         ax.set_ylim([0, 7 * max_runtime * 1.2])
+
+    # Set x-lim
+    x_limit = data[data['Weeks'] <= 1]['MDE'].min()*2
+    ax.set_xlim([0, x_limit])
 
     for week in range(1, max_runtime + 1):
         plot_mde_marker(data, week, ax)
@@ -220,12 +259,14 @@ def mde_plot(data):
 """
 ## Test run times
 
-Run times are plotted with their associated minimum detectable effect (MDE). The longer a test runs, 
-the smaller the impact size the test has the data to detect. This is sometimes referred to as the accuracy 
-of a test.
+Run times are plotted with their associated minimum detectable effect (MDE).
+The longer a test runs, the smaller the impact size the test has the data to
+detect. This is sometimes referred to as the accuracy of a test.
 
-What is an acceptable MDE depends on how much of an impact you believe you might see from your test.
+What is an acceptable MDE depends on how much of an impact you believe you
+might see from your test.
 """
+
 mde_plot(df)
 
 if st.checkbox('Show table'):
