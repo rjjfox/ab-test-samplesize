@@ -286,3 +286,9 @@ if st.checkbox('Show table'):
 # \left(\Phi\left(1 - \frac{\alpha}{2}\right)+\Phi(1-\beta)\right)^2
 # \cdot \frac{p_0(1-p_0) + p_1(1-p_1)}{\left(p_0-p_1\right)^2}
 # """)
+
+"""
+### See also
+
+[AB test significance calculator](http://testcalculator.rfoxdata.co.uk/)
+"""
