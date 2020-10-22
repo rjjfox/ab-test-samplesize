@@ -1,5 +1,9 @@
 # AB test sample size calculator
 
+<p float="right">
+  <img src="./img/samplesize-demofull.gif" width="350px">
+</p>
+
 An AB test sample size calculator, built with Streamlit.
 
 * Powered by Python
@@ -37,6 +41,4 @@ Adding the business value of a conversion helps to understand what is the potent
 
 <br>
 
-<p align="center">
-  <img src="./img/samplesize-demofull.gif" width="738">
-</p>
+
