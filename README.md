@@ -1,6 +1,8 @@
 # AB test sample size calculator
 
-<p float="right">
+<p style="
+    float: right;
+">
   <img src="./img/samplesize-demofull.gif" width="350px">
 </p>
 
