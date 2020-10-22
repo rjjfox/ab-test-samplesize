@@ -1,7 +1,7 @@
 # AB test sample size calculator
 
-<p style="float:right">
-  <img src="./img/samplesize-demofull.gif" width="350px" style="float:right">
+<p>
+  <img src="./img/samplesize-demofull.gif" width="350px" align="right">
 </p>
 
 An AB test sample size calculator, built with Streamlit.
