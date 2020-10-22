@@ -34,11 +34,3 @@ The number of visitors I need in my test to achieve the required sample by itsel
 ## Understanding business impact
 
 Adding the business value of a conversion helps to understand what is the potential benefit/risk behind the change.
-
-<br>
-
----
-
-<br>
-
-
