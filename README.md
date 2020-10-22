@@ -38,5 +38,5 @@ Adding the business value of a conversion helps to understand what is the potent
 <br>
 
 <p align="center">
-  <img src="./img/screenshot.jpg" width="738">
+  <img src="./img/samplesize-demofull.gif" width="738">
 </p>
