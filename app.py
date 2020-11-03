@@ -5,6 +5,11 @@ import matplotlib.ticker as mtick
 from scipy.stats import norm
 import streamlit as st
 
+st.set_page_config(
+    page_title="AB test calculator",
+    page_icon='https://rfoxdata.co.uk/assets/favicon/favicon-32x32.png',
+)
+
 roboto = {'fontname': 'Roboto', 'size': '11'}
 roboto_light = {'fontname': 'Roboto', 'size': '10', 'weight': 'light'}
 roboto_title = {'fontname': 'Roboto', 'size': '12', 'weight': 'bold'}
