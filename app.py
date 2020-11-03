@@ -6,7 +6,7 @@ from scipy.stats import norm
 import streamlit as st
 
 st.set_page_config(
-    page_title="AB test calculator",
+    page_title="AB test sample size calculator",
     page_icon='https://rfoxdata.co.uk/assets/favicon/favicon-32x32.png',
 )
 
