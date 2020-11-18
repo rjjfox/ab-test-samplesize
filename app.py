@@ -295,5 +295,5 @@ if st.checkbox('Show table'):
 """
 ### See also
 
-[AB test significance calculator](http://testcalculator.rfoxdata.co.uk/)
+[AB test significance calculator](https://abtestcalculator.herokuapp.com/)
 """
