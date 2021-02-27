@@ -7,21 +7,17 @@ import streamlit as st
 
 st.set_page_config(
     page_title="AB test sample size calculator",
-    page_icon='https://rfoxdata.co.uk/assets/favicon/favicon-32x32.png',
+    page_icon="https://rfoxdata.co.uk/assets/favicon/favicon-32x32.png",
 )
 
-roboto = {'fontname': 'Roboto', 'size': '11'}
-roboto_light = {'fontname': 'Roboto', 'size': '10', 'weight': 'light'}
-roboto_title = {'fontname': 'Roboto', 'size': '12', 'weight': 'bold'}
-roboto_small = {'fontname': 'Roboto', 'size': '7.5', 'weight': 'light'}
+roboto = {"fontname": "Roboto", "size": "11"}
+roboto_light = {"fontname": "Roboto", "size": "10", "weight": "light"}
+roboto_title = {"fontname": "Roboto", "size": "12", "weight": "bold"}
+roboto_small = {"fontname": "Roboto", "size": "7.5", "weight": "light"}
 
-font = {
-    'family': 'sans-serif',
-    'sans-serif': 'roboto',
-    'size': 11
-}
+font = {"family": "sans-serif", "sans-serif": "roboto", "size": 11}
 
-plt.rc('font', **font)
+plt.rc("font", **font)
 
 """
 # AB Test Sample Sizer
@@ -36,12 +32,12 @@ daily_cons = st.number_input("Daily conversions", value=1000, step=100)
 f"Base conversion rate {daily_cons / daily_obs:.2%}"
 n_variants = st.number_input("Number of variants", value=2)
 
-if st.checkbox('Add business value'):
+if st.checkbox("Add business value"):
     st.write(
         """This is for calculating the potential business value of the change,
         if successful and served to 100%."""
-        )
-    aov = st.number_input('Average conversion value', value=180)
+    )
+    aov = st.number_input("Average conversion value", value=180)
 
 
 def compute_sample_size(p0, mde, alpha=0.05, beta=0.2):
@@ -77,14 +73,16 @@ def compute_sample_size(p0, mde, alpha=0.05, beta=0.2):
 
     p1 = p0 * (1 + mde)
     N = (
-        norm.ppf(1 - alpha / 2) + norm.ppf(1 - beta)
-        ) ** 2 * (p0 * (1 - p0) + p1 * (1 - p1)) / ((p0 - p1) ** 2)
+        (norm.ppf(1 - alpha / 2) + norm.ppf(1 - beta)) ** 2
+        * (p0 * (1 - p0) + p1 * (1 - p1))
+        / ((p0 - p1) ** 2)
+    )
     return int(N)
 
 
 def create_mde_table(
     daily_observations, daily_conversions, n_variants, alpha=0.05, beta=0.2
-        ):
+):
     """Returns the sample sizes and runtimes for different impact sizes based
     on the daily observations and conversions input.
 
@@ -108,26 +106,22 @@ def create_mde_table(
     mde_range = np.arange(0.001, 2.001, 0.001)
 
     sample_sizes = [
-        compute_sample_size(
-            p0, mde, alpha, beta
-            ) * n_variants for mde in mde_range
-        ]
+        compute_sample_size(p0, mde, alpha, beta) * n_variants for mde in mde_range
+    ]
     p1 = [p0 * (1 + mde) for mde in mde_range]
 
     df = pd.DataFrame([mde_range, p1, sample_sizes]).transpose()
-    df.columns = ['MDE', 'New Conv. Rate', 'Sample Size']
+    df.columns = ["MDE", "New Conv. Rate", "Sample Size"]
     # We convert to np.int64 to round the number and also to avoid
     # hitting the int32 limit
-    df['Sample Size'] = df['Sample Size'].astype(np.int64)
-    df['Days'] = df['Sample Size'] / daily_observations
-    df['Weeks'] = df['Days'] / 7
-    df['Extra conversions (monthly)'] = round(
+    df["Sample Size"] = df["Sample Size"].astype(np.int64)
+    df["Days"] = df["Sample Size"] / daily_observations
+    df["Weeks"] = df["Days"] / 7
+    df["Extra conversions (monthly)"] = round(
         p0 * df.MDE * daily_observations * 365 / 12
-        )
+    )
     try:
-        df['Extra revenue (monthly)'] = round(
-            df['Extra conversions (monthly)'] * aov
-            )
+        df["Extra revenue (monthly)"] = round(df["Extra conversions (monthly)"] * aov)
     except NameError:
         pass
 
@@ -135,12 +129,14 @@ def create_mde_table(
 
 
 # Sidebar - optional parameters
-st.sidebar.markdown("""
+st.sidebar.markdown(
+    """
 ### Significance level
 
 95% is often used as the threshold before a result is declared as
 statistically significant.
-""")
+"""
+)
 
 
 def percentage_format(x):
@@ -148,71 +144,65 @@ def percentage_format(x):
 
 
 alpha = 1 - st.sidebar.selectbox(
-    'Significance level',
-    [0.90, 0.95, 0.99],
-    index=1,
-    format_func=percentage_format
+    "Significance level", [0.90, 0.95, 0.99], index=1, format_func=percentage_format
 )
 
-st.sidebar.markdown("""
+st.sidebar.markdown(
+    """
 ### Statistical power
 
 80% is generally accepted as the minimum required power level.
-""")
-beta = 1 - st.sidebar.slider(
-    'Power', value=0.8, min_value=0.5, max_value=0.99
-    )
+"""
+)
+beta = 1 - st.sidebar.slider("Power", value=0.8, min_value=0.5, max_value=0.99)
 
-st.sidebar.markdown("""
+st.sidebar.markdown(
+    """
 ### Maximum runtime
 
 To show increased runtimes on the plot.
-""")
-max_runtime = st.sidebar.number_input(
-    'Max runtime (weeks)', value=4, max_value=20
-    )
+"""
+)
+max_runtime = st.sidebar.number_input("Max runtime (weeks)", value=4, max_value=20)
 
-df = create_mde_table(
-    daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta
-    )
+df = create_mde_table(daily_obs, daily_cons, n_variants, alpha=alpha, beta=beta)
 
 
 def plot_mde_marker(df, weeks, ax):
     days = weeks * 7
     ax.axhline(
-        y=days, linestyle='--',
-        xmax=(
-            df[df['Weeks'] <= weeks]['MDE'].min() -
-            ax.get_xlim()[0]) / ax.get_xlim()[1] - 0.01
-            )
+        y=days,
+        linestyle="--",
+        xmax=(df[df["Weeks"] <= weeks]["MDE"].min() - ax.get_xlim()[0])
+        / ax.get_xlim()[1]
+        - 0.01,
+    )
     if weeks > 1:
-        week_text = 'weeks'
+        week_text = "weeks"
     else:
-        week_text = 'week'
+        week_text = "week"
     ax.text(
         ax.get_xlim()[0],
         days + 1,
         f"{weeks} {week_text}",
-        horizontalalignment='left',
-        **roboto
+        horizontalalignment="left",
+        **roboto,
     )
 
     try:
-        isLess = df['Weeks'] <= weeks
-        mde_text = "MDE = {:.2%}, Monthly value = £{:,.0f}" \
-            .format(
-                df[isLess]['MDE'].min(),
-                df[isLess]['Extra revenue (monthly)'].min()
-                )
+        isLess = df["Weeks"] <= weeks
+        mde_text = "MDE = {:.2%}, Monthly value = £{:,.0f}".format(
+            df[isLess]["MDE"].min(), df[isLess]["Extra revenue (monthly)"].min()
+        )
     except KeyError:
         mde_text = f"MDE = {df[isLess]['MDE'].min():.2%}"
 
     ax.text(
-        df[df['Weeks'] <= weeks]['MDE'].min()*1.05,
+        df[df["Weeks"] <= weeks]["MDE"].min() * 1.05,
         days - 0.5,
         mde_text,
-        horizontalalignment='left',
-        **roboto
+        horizontalalignment="left",
+        **roboto,
     )
 
 
@@ -223,9 +213,8 @@ def y_format(x, pos):
 def mde_plot(data):
     fig, ax = plt.subplots(figsize=(10, 5), dpi=100)
     ax.plot(
-        'MDE', 'Days', data=data,
-        linewidth=2, solid_capstyle='round', color='#014d64'
-        )
+        "MDE", "Days", data=data, linewidth=2, solid_capstyle="round", color="#014d64"
+    )
 
     # Formatting the tick labels
 
@@ -233,17 +222,15 @@ def mde_plot(data):
     ax.xaxis.set_major_formatter(mtick.PercentFormatter(1.0))
 
     # Formatting the axes labels
-    ax.set_xlabel('Minimum detectable effect',
-                  **roboto
-                  )
-    ax.set_ylabel('')
+    ax.set_xlabel("Minimum detectable effect", **roboto)
+    ax.set_ylabel("")
 
     # Set limit to reasonable amount of time
     if ax.get_ylim()[1] > 60:
         ax.set_ylim([0, 7 * max_runtime * 1.2])
 
     # Set x-lim
-    x_limit = data[data['Weeks'] <= 1]['MDE'].min()*2
+    x_limit = data[data["Weeks"] <= 1]["MDE"].min() * 2
     ax.set_xlim([0, x_limit])
 
     for week in range(1, max_runtime + 1):
@@ -251,9 +238,9 @@ def mde_plot(data):
 
     # Clean up layout of graph, removing borders
     ax.yaxis.grid(True)
-    ax.spines['left'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
+    ax.spines["left"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
 
     # Hiding the y-axis
     ax.axes.get_yaxis().set_visible(False)
@@ -274,14 +261,14 @@ might see from your test.
 
 mde_plot(df)
 
-if st.checkbox('Show table'):
+if st.checkbox("Show table"):
     new = pd.DataFrame()
     for i in range(1, max_runtime + 1):
         if i > 1:
-            week_text = 'weeks'
+            week_text = "weeks"
         else:
-            week_text = 'week'
-        new[f"{i} {week_text}"] = df[df['Weeks'] <= i].iloc[0]
+            week_text = "week"
+        new[f"{i} {week_text}"] = df[df["Weeks"] <= i].iloc[0]
     st.write(new)
 
 # """
@@ -295,5 +282,6 @@ if st.checkbox('Show table'):
 """
 ### See also
 
-[AB test significance calculator](https://abtestcalculator.herokuapp.com/)
+* [AB test significance calculator](https://abtestcalculator.herokuapp.com/)
+* [Github Repository](https://github.com/rjjfox/ab-test-samplesize)
 """
