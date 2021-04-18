@@ -144,7 +144,7 @@ def percentage_format(x):
 
 
 alpha = 1 - st.sidebar.selectbox(
-    "Significance level", [0.90, 0.95, 0.99], index=1, format_func=percentage_format
+    "Significance level", [0.80, 0.90, 0.95, 0.99], index=1, format_func=percentage_format
 )
 
 st.sidebar.markdown(
