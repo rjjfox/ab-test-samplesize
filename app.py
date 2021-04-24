@@ -148,7 +148,6 @@ alpha = 1 - st.sidebar.slider(
     value=0.95,
     min_value=0.5,
     max_value=0.99,
-    format_func=percentage_format,
 )
 
 st.sidebar.markdown(
