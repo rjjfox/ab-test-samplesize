@@ -143,8 +143,12 @@ def percentage_format(x):
     return f"{x:.0%}"
 
 
-alpha = 1 - st.sidebar.selectbox(
-    "Significance level", [0.80, 0.90, 0.95, 0.99], index=1, format_func=percentage_format
+alpha = 1 - st.sidebar.slider(
+    "Significance level",
+    value=0.95,
+    min_value=0.5,
+    max_value=0.99,
+    format_func=percentage_format,
 )
 
 st.sidebar.markdown(
