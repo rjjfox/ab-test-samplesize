@@ -30,7 +30,7 @@ daily_obs = st.number_input("Daily observations", value=20000, step=100)
 daily_cons = st.number_input("Daily conversions", value=1000, step=100)
 
 f"Base conversion rate {daily_cons / daily_obs:.2%}"
-n_variants = st.number_input("Number of variants", value=2)
+n_variants = st.number_input("Number of variants (incl. the control)", value=2)
 
 if st.checkbox("Add business value"):
     st.write(
