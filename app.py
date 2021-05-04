@@ -40,7 +40,7 @@ if st.checkbox("Add business value"):
     aov = st.number_input("Average conversion value", value=180)
 
 
-def compute_sample_size(p0, mde, alpha=0.05, beta=0.2):
+def compute_sample_size(p0, mde, alpha=0.05, beta=0.2, tails="Two"):
     """
     Returns the sample size for a two-tailed AB test comparing conversion
     rates.
@@ -66,14 +66,23 @@ def compute_sample_size(p0, mde, alpha=0.05, beta=0.2):
         acceptable and provides the test with 80% statistical power as is
         standard.
 
+    tails : str
+        One or two tails to specify what type of hypothesis test this is.
+
     Returns
     -------
     Minimum number of observations required per variant.
     """
 
+    # Conditional alpha value based on whether one or two tail test
+    if tails == "Two":
+        computed_alpha = alpha / 2
+    else:
+        computed_alpha = alpha
+
     p1 = p0 * (1 + mde)
     N = (
-        (norm.ppf(1 - alpha / 2) + norm.ppf(1 - beta)) ** 2
+        (norm.ppf(1 - computed_alpha) + norm.ppf(1 - beta)) ** 2
         * (p0 * (1 - p0) + p1 * (1 - p1))
         / ((p0 - p1) ** 2)
     )
@@ -106,7 +115,8 @@ def create_mde_table(
     mde_range = np.arange(0.001, 2.001, 0.001)
 
     sample_sizes = [
-        compute_sample_size(p0, mde, alpha, beta) * n_variants for mde in mde_range
+        compute_sample_size(p0, mde, alpha, beta, num_tails) * n_variants
+        for mde in mde_range
     ]
     p1 = [p0 * (1 + mde) for mde in mde_range]
 
@@ -158,6 +168,14 @@ st.sidebar.markdown(
 """
 )
 beta = 1 - st.sidebar.slider("Power", value=0.8, min_value=0.5, max_value=0.99)
+
+st.sidebar.markdown(
+    """
+    ### One vs. two tails
+"""
+)
+num_tails = st.sidebar.radio("Number of tails", ("One", "Two"), index=1)
+
 
 st.sidebar.markdown(
     """
