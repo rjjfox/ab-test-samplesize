@@ -8,6 +8,8 @@ See it live [here](https://abtestsamplesize.herokuapp.com/).
   <img src="./img/samplesize-demofull.gif" width="400px">
 </p>
 
+See also my [AB test significance calculator](https://github.com/rjjfox/ab-test-calculator).
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
