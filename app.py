@@ -305,4 +305,5 @@ if st.checkbox("Show table"):
 
 * [AB test significance calculator](https://abtestcalculator.herokuapp.com/)
 * [Github Repository](https://github.com/rjjfox/ab-test-samplesize)
+* [App background](https://rfoxdata.co.uk/2020/10/22/Sample-size-calculator.html)
 """
