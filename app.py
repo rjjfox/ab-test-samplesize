@@ -5,21 +5,16 @@ import matplotlib.ticker as mtick
 from scipy.stats import norm
 import streamlit as st
 
+# Fonts
+from fonts import apply_matplotlib_defaults
+from fonts import FONT_DEFAULT
+
 st.set_page_config(
     page_title="AB test sample size calculator",
     page_icon="https://rfoxdata.co.uk/assets/favicon/favicon-32x32.png",
 )
 
-# Use a font that ships with Matplotlib to avoid missing font warnings
-matplotlib_font = "DejaVu Sans"
-roboto = {"fontname": matplotlib_font, "size": "11"}
-roboto_light = {"fontname": matplotlib_font, "size": "10", "weight": "light"}
-roboto_title = {"fontname": matplotlib_font, "size": "12", "weight": "bold"}
-roboto_small = {"fontname": matplotlib_font, "size": "7.5", "weight": "light"}
-
-font = {"family": "sans-serif", "sans-serif": matplotlib_font, "size": 11}
-
-plt.rc("font", **font)
+apply_matplotlib_defaults()
 
 """
 # AB Test Sample Sizer
@@ -209,7 +204,7 @@ def plot_mde_marker(df, weeks, ax):
         days + 1,
         f"{weeks} {week_text}",
         horizontalalignment="left",
-        **roboto,
+        **FONT_DEFAULT,
     )
 
     try:
@@ -225,7 +220,7 @@ def plot_mde_marker(df, weeks, ax):
         days - 0.5,
         mde_text,
         horizontalalignment="left",
-        **roboto,
+        **FONT_DEFAULT,
     )
 
 
@@ -245,7 +240,7 @@ def mde_plot(data):
     ax.xaxis.set_major_formatter(mtick.PercentFormatter(1.0))
 
     # Formatting the axes labels
-    ax.set_xlabel("Minimum detectable effect", **roboto)
+    ax.set_xlabel("Minimum detectable effect", **FONT_DEFAULT)
     ax.set_ylabel("")
 
     # Set limit to reasonable amount of time
