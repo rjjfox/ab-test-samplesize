@@ -2,10 +2,10 @@
 
 An AB test sample size calculator. Calculations come through basic SciPy.stats methods, the web app is built with Streamlit and hosted on Heroku.
 
-See it live [here](https://abtestsamplesize.herokuapp.com/).
+See the [app live here](https://ab-test-samplesize.streamlit.app/).
 
 <p align="center">
-  <img src="./img/samplesize-demofull.gif" width="400px">
+  <img src="./img/samplesize-demofull.gif" width="400px" alt="example usage of the sample size calculator">
 </p>
 
 See also my [AB test significance calculator](https://github.com/rjjfox/ab-test-calculator).
@@ -50,23 +50,13 @@ docker run -dp 80:8080 ryanfox212/samplesize
 
 ## Deployment
 
-I utilised Heroku's free tier to host the web app. To do the same, create a project on Heroku's website and then I recommend linking the project to a Github repository in the Deploy section.
-
-Alternatively, you can use the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli). Provided you have already created a project on the site, use
-
-```cli
-heroku git:remote -a [project-name]
-git push heroku master
-```
-
-Use the same project name as the one you created. If successful, you can then go to `https://[project-name].herokuapp.com/`.
+I utilised Streamit's Community Cloud service to host the app.
 
 ## Built With
 
-- [Streamlit](https://www.streamlit.io/) - The web application framework used
+- [Streamlit](https://www.streamlit.io/) - The web application framework used and deployment service
 - [SciPy](https://www.scipy.org/) - For the statistical methods
 - [Seaborn](https://seaborn.pydata.org/) - For vizualisations
-- [Heroku](https://heroku.com/) - Cloud platform used for deployment
 
 ## Features
 
