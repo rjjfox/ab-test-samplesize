@@ -10,12 +10,14 @@ st.set_page_config(
     page_icon="https://rfoxdata.co.uk/assets/favicon/favicon-32x32.png",
 )
 
-roboto = {"fontname": "Roboto", "size": "11"}
-roboto_light = {"fontname": "Roboto", "size": "10", "weight": "light"}
-roboto_title = {"fontname": "Roboto", "size": "12", "weight": "bold"}
-roboto_small = {"fontname": "Roboto", "size": "7.5", "weight": "light"}
+# Use a font that ships with Matplotlib to avoid missing font warnings
+matplotlib_font = "DejaVu Sans"
+roboto = {"fontname": matplotlib_font, "size": "11"}
+roboto_light = {"fontname": matplotlib_font, "size": "10", "weight": "light"}
+roboto_title = {"fontname": matplotlib_font, "size": "12", "weight": "bold"}
+roboto_small = {"fontname": matplotlib_font, "size": "7.5", "weight": "light"}
 
-font = {"family": "sans-serif", "sans-serif": "roboto", "size": 11}
+font = {"family": "sans-serif", "sans-serif": matplotlib_font, "size": 11}
 
 plt.rc("font", **font)
 
